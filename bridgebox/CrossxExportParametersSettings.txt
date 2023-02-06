@@ -1,0 +1,28 @@
+Export Parameter settings
+Number format = DEFAULT
+Linebreak after parameter name = FALSE
+Linebreak after parameter = TRUE
+Linebreak after comment = TRUE
+Prefix w/tab = FALSE
+Include Parameter Name = TRUE
+Decimal Point = MS Default
+
+BEGIN PARAMETERS
+Thinwalled parameters:
+
+§Area (true)
+§Mass
+§y' of E-weighted c.o.g.
+§z' of E-weighted c.o.g.
+§y' of shear-center
+§z' of shear-center
+
+§I_y' (y' at c.o.g.)
+§I_z' (z' at c.o.g.)
+§I_y'z' (at c.o.g.)
+§I_omega (warping/Cw)
+§I_r (polar)
+§Polar torsional stiffness
+§I_t
+§Warping stiffness
+END PARAMETERS
