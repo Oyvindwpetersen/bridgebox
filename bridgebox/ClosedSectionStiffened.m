@@ -155,7 +155,7 @@ for k=1:size(NodesBox,1)
     if isempty(DistanceEdgeStart)
         % Add stiffeners until DistanceEnd is smaller than DistanceEdgeMin
         for n_stiff=0:100
-            DistanceEdge=(L_el(k)-(n_stiff-1)*StiffenerCenterDist(k))/2;
+            DistanceEdge=(L_el(k)-(n_stiff-1)*StiffenerCenterDist(k)-DistanceBase/2*2)/2;
             if DistanceEdge<DistanceEdgeMin(k)
                 n_stiff=n_stiff-1;
                 DistanceEdge=(L_el(k)-(n_stiff-1)*StiffenerCenterDist(k))/2;
