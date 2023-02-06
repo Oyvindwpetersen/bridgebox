@@ -15,6 +15,7 @@ p=inputParser;
 addParameter(p,'MarkerSize',3)
 addParameter(p,'NodeColor',[1 0 0])
 addParameter(p,'ElColor',[0 0 1])
+addParameter(p,'LineWidth',0.75)
 addParameter(p,'PlotText',true,@islogical)
 addParameter(p,'PlotThickness',true,@islogical)
 addParameter(p,'FontSize',6)
@@ -27,6 +28,7 @@ parse(p,varargin{:});
 MarkerSize=p.Results.MarkerSize;
 NodeColor=p.Results.NodeColor;
 ElColor=p.Results.ElColor;
+LineWidth=p.Results.LineWidth;
 PlotText=p.Results.PlotText;
 PlotThickness=p.Results.PlotThickness;
 FontSize=p.Results.FontSize;
