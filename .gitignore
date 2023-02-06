@@ -3,6 +3,16 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Other
+develop/
+__old__/
+
+# Python cache
+**/__pycache__/
+*.pyc
+
+# TOML file
+*.toml
 # C extensions
 *.so
 
