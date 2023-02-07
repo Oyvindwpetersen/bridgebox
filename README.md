@@ -1,2 +1,2 @@
 # bridgebox
- Design and calculation cross section parameters for closed-box steel bridge decks
+ Design and calculation of cross section parameters for closed-box steel bridge decks with stiffeners
