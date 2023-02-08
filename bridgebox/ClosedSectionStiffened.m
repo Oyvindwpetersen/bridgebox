@@ -95,8 +95,13 @@ for k=1:size(NodesBox,1)
     
 end
 
-% Find length of base of each stiffener type
+% Check that stiffener start in (0,0)
 for k=1:length(StiffenerGeo)
+
+    if any(isnan(StiffenerGeo{k})) | isempty(StiffenerGeo{k})
+        continue
+    end
+
     if StiffenerGeo{k}(1,1)~=0 | StiffenerGeo{k}(1,2)~=0
         k
         StiffenerGeo{k}
@@ -106,6 +111,12 @@ end
 
 % Find length of base of each stiffener type
 for k=1:length(StiffenerGeo)
+
+    % If no stiffener, continue
+    if isnan(StiffenerType(k))
+        StiffenerBase(k)=NaN;
+        continue
+    end
     
     % If z-coordinate of last point is not zero, the stiffener is open (e.g. knife)
     if StiffenerGeo{k}(end,2)~=0
@@ -294,7 +305,7 @@ Thickness(ind_delete,:)=[];
 %% Plot
 
 if DoPlot
-    PlotThinWalledSection(Nodes,Elements,Thickness,[],[],[],[],'PlotText',PlotText);
+    PlotThinWalledSection(Nodes,Elements,Thickness,[],[],[],[],'PlotText',PlotText,'FontSize',8);
 end
 
 if DoPlotStiffener
@@ -307,7 +318,7 @@ if DoPlotStiffener
         StiffNodes=[ [1:size(StiffenerGeo{k},1)].' StiffenerGeo{k}];
         StiffElements=[  [1:(size(StiffNodes,1)-1)].' [1:(size(StiffNodes,1)-1)].'  [2:size(StiffNodes,1)].' ];
         StiffThickness=[StiffenerThickness(k)];
-        PlotThinWalledSection(StiffNodes,StiffElements,Thickness,[],[],[],[],'PlotText',PlotText,'hax',ha(k));
+        PlotThinWalledSection(StiffNodes,StiffElements,Thickness,[],[],[],[],'PlotText',PlotText,'FontSize',8,'hax',ha(k));
         
     end
 end
