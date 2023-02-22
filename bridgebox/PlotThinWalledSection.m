@@ -53,7 +53,7 @@ axis image;
 
 % If no thickness provided,
 if isempty(Thickness)
-    Thickness=NaN*ones(size(Elements,1),1)
+    Thickness=NaN*ones(size(Elements,1),1);
 end
 
 % If elements is empty, assume a closed section with elements from node 1 to node 2
