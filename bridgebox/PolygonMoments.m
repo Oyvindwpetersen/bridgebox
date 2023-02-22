@@ -25,7 +25,7 @@ if size(CoordXY,2)>size(CoordXY,1)
     CoordXY=CoordXY.';
 end
 
-% COnvert to cell, compute for each cell element
+% Convert to cell, compute for each cell element
 if ~iscell(CoordXY)
     CoordXY_temp=CoordXY;
     clear CoordXY
