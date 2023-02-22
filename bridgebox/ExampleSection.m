@@ -30,6 +30,13 @@ opt.DistanceEdgeMin=DistanceEdgeMin
 
 [Nodes,Elements,Thickness]=ClosedSectionStiffened(NodesBox,ThicknessBox,StiffenerType,StiffenerCenterDist,StiffenerGeo,StiffenerThickness,opt);
 
+CrossxGenerateThinWalledSection(Nodes,Elements,Thickness,'RectangleUnsym','examples\RectangleUnsym',true,'unit','m');
+
+% [~,~,M_out]=CrossxExportParameters('examples\RectangleUnsymParameters.txt');
+
+% [yc,zc,A,Iy,Iz,Iyz]=SectionParameters(Nodes,Elements,Thickness)
+
+
 return
 %% Sulafjorden
 
@@ -64,7 +71,7 @@ opt.DistanceEdgeMin=DistanceEdgeMin
 
 [Nodes,Elements,Thickness]=ClosedSectionStiffened(NodesBox,ThicknessBox,StiffenerType,StiffenerCenterDist,StiffenerGeo,StiffenerThickness,opt);
 
-CrossxGenerateThinWalledSection(Nodes,Elements,Thickness,'TestSulafjorden','TestSulafjorden',true,'unit','m');
+CrossxGenerateThinWalledSection(Nodes,Elements,Thickness,'examples\Sulafjorden','Sulafjorden',true,'unit','m');
 
 [A,Cx,Cy,Ix,Iy,Ixy,P]=PolygonMoments(Nodes(:,2:3))
 
@@ -108,8 +115,51 @@ opt.N_stiff=N_stiff
 [Nodes,Elements,Thickness]=ClosedSectionStiffened(NodesBox,ThicknessBox,StiffenerType,StiffenerCenterDist,StiffenerGeo,StiffenerThickness,opt);
 
 
-CrossxGenerateThinWalledSection(Nodes,Elements,Thickness,'TestHalogaland','TestHalogaland',true,'unit','m');
+CrossxGenerateThinWalledSection(Nodes,Elements,Thickness,'Halogaland','examples\Halogaland',true,'unit','m');
 
 [A,Cx,Cy,Ix,Iy,Ixy,P]=PolygonMoments(Nodes(:,2:3))
 
-%%
+[M,ParNamesRed,M_out]=CrossxExportParameters('examples\HalogalandParameters.txt')
+
+[yc,zc,A,Iy,Iz,Iyz]=SectionParameters(Nodes,Elements,Thickness)
+
+
+%% Rectangle
+
+clc
+clear all
+close all
+
+x=[0 4 4 0];
+y=[0 0 9 9];
+
+NodesBox=[x' y'];
+
+StiffenerType=[NaN NaN NaN NaN];
+StiffenerCenterDist=[NaN NaN NaN NaN];
+DistanceEdgeMin=nan*ones(size(StiffenerCenterDist));
+
+ThicknessBox=[8 12 8 12]*1e-3;
+
+StiffenerGeo{1}=[NaN]
+StiffenerThickness=[NaN]*1e-3;
+
+DistanceEdgeStart=[];
+
+opt=struct();
+opt.plot=true
+opt.plotstiffener=false
+opt.plottext=true
+opt.DistanceEdgeMin=DistanceEdgeMin
+opt.DistanceEdgeStart=DistanceEdgeStart
+% opt.N_stiff=N_stiff
+
+[Nodes,Elements,Thickness]=ClosedSectionStiffened(NodesBox,ThicknessBox,StiffenerType,StiffenerCenterDist,StiffenerGeo,StiffenerThickness,opt);
+
+CrossxGenerateThinWalledSection(Nodes,Elements,Thickness,'Rectangle','examples\Rectangle',true,'unit','m');
+
+[A,Cx,Cy,Ix,Iy,Ixy,P]=PolygonMoments(Nodes(:,2:3))
+
+% [M,ParNamesRed,M_out]=CrossxExportParameters('examples\RectangleParameters.txt');
+
+% [yc,zc,A,Iy,Iz,Iyz]=SectionParameters(Nodes,Elements,Thickness)
