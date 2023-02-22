@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Matlab
+*.asv
+
+develop/
+__old__/
+
 # Other
 develop/
 __old__/
