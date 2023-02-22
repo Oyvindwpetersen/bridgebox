@@ -1,8 +1,25 @@
-function [M,ParNamesRed,M_out]=crossxExportParameters(name_file)
+function [M,ParNamesRed,M_out]=CrossxExportParameters(name_file)
 
 %%
 
-data=inpReadFile(name_file);
+if exist(name_file)~=2
+    error(['File ' name_files ' does not exist']);
+end
+
+%%
+rehash
+
+[fid_input,errormsg]=fopen(name_file, 'r');
+
+if ~isempty(errormsg)
+    disp('Error in reading input file:');
+    disp(errormsg);
+	return
+end
+
+data=textscan(fid_input, '%s', 'delimiter', '\n', 'whitespace', '');
+data=data{1}; %read inputfile
+fclose(fid_input);
 
 ParNames={...
     'Area (true)'
