@@ -51,17 +51,18 @@ end
 hold on; grid on;
 axis image;
 
-% If no thickness provided,
-if isempty(Thickness)
-    Thickness=NaN*ones(size(Elements,1),1);
-end
-
 % If elements is empty, assume a closed section with elements from node 1 to node 2
 if isempty(Elements)
     ElNumber=1:size(Nodes,1);
     NodeNumberStart=Nodes(:,1);
     NodeNumberEnd=[ NodeNumberStart(2:end) ; NodeNumberStart(1)];
     Elements=[ ElNumber.' NodeNumberStart NodeNumberEnd];
+end
+
+
+% If no thickness provided,
+if isempty(Thickness)
+    Thickness=NaN*ones(size(Elements,1),1);
 end
 
 % shift=true shifts the section to the center of area
