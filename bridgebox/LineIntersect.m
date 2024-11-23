@@ -1,4 +1,4 @@
-function [t_a,t_b,I_a,I_b]=LineIntersect(N_a,N_b,n_a,n_b)
+function [t_a,t_b,I_a,I_b]=lineintersect(N_a,N_b,n_a,n_b)
 %% Calculate intersection of two lines 
 %
 % Parametrized vectors:

@@ -1,9 +1,9 @@
-function PlotThinWalledSection(Nodes,Elements,Thickness,yc,zc,ys,zs,varargin)
+function plotthinwalledsection(nodes,elements,thickness,yc,zc,ys,zs,varargin)
 %% Plot thin-walled section (box girder)
 %
-% Nodes: matrix with rows [nodenumber, coord_y, coord_z]
-% Elements: matrix with rows [elnumber, nodenumber1, nodenumber2]
-% Thickness: vector with element thickness corresponding to elements
+% nodes: matrix with rows [nodenumber, coord_y, coord_z]
+% elements: matrix with rows [el_number, nodenumber1, nodenumber2]
+% thickness: vector with element thickness corresponding to elements
 % yc: center of area
 % zc: center of area
 % ys: center of shear
@@ -12,30 +12,32 @@ function PlotThinWalledSection(Nodes,Elements,Thickness,yc,zc,ys,zs,varargin)
 %% Parse inputs
 
 p=inputParser;
-addParameter(p,'MarkerSize',3)
-addParameter(p,'NodeColor',[1 0 0])
-addParameter(p,'ElColor',[0 0 1])
-addParameter(p,'LineWidth',0.75)
-addParameter(p,'PlotText',true,@islogical)
-addParameter(p,'PlotThickness',true,@islogical)
-addParameter(p,'FontSize',6)
+addParameter(p,'markersize',3)
+addParameter(p,'nodecolor',[1 0 0])
+addParameter(p,'elcolor',[0 0 1])
+addParameter(p,'linewidth',0.75)
+addParameter(p,'plottext',true,@islogical)
+addParameter(p,'plotthickness',true,@islogical)
+addParameter(p,'fontsize',6)
 addParameter(p,'shift',false,@islogical)
 addParameter(p,'offset',[],@isnumeric)
 addParameter(p,'mirror',false,@islogical)
 addParameter(p,'hax',[],@ishandle)
+addParameter(p,'interpreter','latex',@ischar)
 
 parse(p,varargin{:});
-MarkerSize=p.Results.MarkerSize;
-NodeColor=p.Results.NodeColor;
-ElColor=p.Results.ElColor;
-LineWidth=p.Results.LineWidth;
-PlotText=p.Results.PlotText;
-PlotThickness=p.Results.PlotThickness;
-FontSize=p.Results.FontSize;
+markersize=p.Results.markersize;
+nodecolor=p.Results.nodecolor;
+elcolor=p.Results.elcolor;
+linewidth=p.Results.linewidth;
+plottext=p.Results.plottext;
+plotthickness=p.Results.plotthickness;
+fontsize=p.Results.fontsize;
 shift=p.Results.shift;
 offset=p.Results.offset;
 mirror=p.Results.mirror;
 hax=p.Results.hax;
+interpreter=p.Results.interpreter;
 
 %%
 
@@ -52,29 +54,29 @@ hold on; grid on;
 axis image;
 
 % If elements is empty, assume a closed section with elements from node 1 to node 2
-if isempty(Elements)
-    ElNumber=1:size(Nodes,1);
-    NodeNumberStart=Nodes(:,1);
-    NodeNumberEnd=[ NodeNumberStart(2:end) ; NodeNumberStart(1)];
-    Elements=[ ElNumber.' NodeNumberStart NodeNumberEnd];
+if isempty(elements)
+    el_number=1:size(nodes,1);
+    node_number_start=nodes(:,1);
+    node_number_end=[ node_number_start(2:end) ; node_number_start(1)];
+    elements=[ el_number.' node_number_start node_number_end];
 end
 
 
 % If no thickness provided,
-if isempty(Thickness)
-    Thickness=NaN*ones(size(Elements,1),1);
+if isempty(thickness)
+    thickness=NaN*ones(size(elements,1),1);
 end
 
 % shift=true shifts the section to the center of area
 if shift==true
     
-    Nodes_shift=Nodes-[0 yc zc];
+    nodes_shift=nodes-[0 yc zc];
     yc_shift=yc-yc;
     zc_shift=yc-yc;
     ys_shift=ys-yc;
     zs_shift=zs-zc;
     
-    Nodes=Nodes_shift;
+    nodes=nodes_shift;
     yc=yc_shift;
     zc=zc_shift;
     ys=ys_shift;
@@ -85,7 +87,7 @@ end
 % Shift whole section
 if ~isempty(offset)
     
-    Nodes=Nodes+[0 offset];
+    nodes=nodes+[0 offset];
     yc=yc+offset(1);
     zc=zc+offset(2);
     
@@ -96,53 +98,56 @@ end
 % Mirror section left-right
 if mirror==true
     
-    Nodes1=Nodes;
-    Nodes2=[Nodes(:,1)+100e3 -Nodes(:,2) Nodes(:,3)];
+    nodes1=nodes;
+    nodes2=[nodes(:,1)+100e3 -nodes(:,2) nodes(:,3)];
     
-    Elements1=Elements;
-    Elements2=Elements+100e3;
+    elements1=elements;
+    elements2=elements+100e3;
     
-    Thickness1=Thickness;
-    Thickness2=[Thickness(:,1)+100e3];
+    thickness1=thickness;
+    thickness2=[thickness(:,1)+100e3];
     
-    Nodes=[Nodes1 ; Nodes2];
-    Elements=[Elements1 ; Elements2];
-    Thickness=[Thickness1 ; Thickness2];
+    nodes=[nodes1 ; nodes2];
+    elements=[elements1 ; elements2];
+    thickness=[thickness1 ; thickness2];
     
 end
 
-% Plot nodes are markers
-plot(Nodes(:,2),Nodes(:,3),'o','MarkerSize',MarkerSize,'Color',NodeColor);
+% Plot nodes as markers
+if markersize==0 | isnan(markersize)
+else
+plot(nodes(:,2),nodes(:,3),'o','markersize',markersize,'Color',nodecolor);
+end
 
 % Plot node labels
-if PlotText
-    for k=1:length(Nodes)
-        text(Nodes(k,2),Nodes(k,3),['N' num2str(Nodes(k,1))],'FontSize',FontSize);
+if plottext
+    for k=1:length(nodes)
+        text(nodes(k,2),nodes(k,3),['N' num2str(nodes(k,1))],'fontsize',fontsize);
     end
 end
 
 % Plot elements
-for k=1:size(Elements,1)
+for k=1:size(elements,1)
     
-    % Index of node 1 and node 2
-    ind1=find(Elements(k,2)==Nodes(:,1));
-    ind2=find(Elements(k,3)==Nodes(:,1));
+    % idxex of node 1 and node 2
+    idx1=find(elements(k,2)==nodes(:,1));
+    idx2=find(elements(k,3)==nodes(:,1));
     
-    N1=Nodes(ind1,2:3);
-    N2=Nodes(ind2,2:3);
+    N1=nodes(idx1,2:3);
+    N2=nodes(idx2,2:3);
     
-    plot([N1(1) N2(1)],[N1(2) N2(2)],'-','Color',ElColor);
+    plot([N1(1) N2(1)],[N1(2) N2(2)],'-','Color',elcolor,'linewidth',linewidth);
     
     % Plot element labels
-    if PlotText
+    if plottext
         
-        ElementText=['E' num2str(Elements(k,1))];
+        element_text=['E' num2str(elements(k,1))];
         
-        if PlotThickness
-            ElementText=[ElementText ', t=' num2str(Thickness(k,1),'%0.1e')];
+        if plotthickness
+            element_text=[element_text ', t=' num2str(thickness(k,1),'%0.1e')];
         end
         
-        text(mean([N1(1) N2(1)]),mean([N1(2) N2(2)]),ElementText,'FontSize',FontSize);
+        text(mean([N1(1) N2(1)]),mean([N1(2) N2(2)]),element_text,'fontsize',fontsize);
     end
     
 end
@@ -151,20 +156,19 @@ end
 if ~isempty(yc) & ~isempty(zc)
     plot(yc,zc,'xb');
     plot(yc,zc,'ob');
-    text(yc,zc,'  CA','Color','b','FontSize',FontSize,'BackGroundColor','none');
+    text(yc,zc,'  CA','Color','b','fontsize',fontsize,'BackGroundColor','none');
 end
 
 % Plot shear center
 if ~isempty(ys) & ~isempty(zs)
     plot(ys,zs,'xr');
     plot(ys,zs,'or');
-    text(ys,zs,'CS  ','Color','r','FontSize',FontSize,'VerticalAlignment','Top','HorizontalAlignment','Right','BackGroundColor','none');
+    text(ys,zs,'CS  ','Color','r','fontsize',fontsize,'VerticalAlignment','Top','HorizontalAlignment','Right','BackGroundColor','none');
 end
 
-xlim([min(Nodes(:,2))-1 max(Nodes(:,2))+1]);
-ylim([min(Nodes(:,3))-0.5 max(Nodes(:,3))+0.5]);
+xlim([min(nodes(:,2))-1 max(nodes(:,2))+1]);
+ylim([min(nodes(:,3))-0.5 max(nodes(:,3))+0.5]);
 axistight(gca,[0.1 0.1],'x','y');
 
-xlabel('y [m]');
-ylabel('z [m]');
-
+xlabel('$y$ [m]','Interpreter',interpreter);
+ylabel('$z$ [m]','Interpreter',interpreter);

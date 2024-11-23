@@ -1,12 +1,12 @@
-function Nodes_offset=OffsetGeometry(Nodes,offset,varargin)
+function nodes_offset=offsetgeometry(nodes,offset,varargin)
 %% Function to offset closed section
 %
 % Inputs:
-% Nodes: [N*2] matrix with 2D coordinates
+% nodes: [N*2] matrix with 2D coordinates
 % offset: vector with offset values for elements between nodes, if scalar then equal for all
 %
 % Outputs:
-% Nodes_offset: [N*2] matrix with coordinates with offset
+% nodes_offset: [N*2] matrix with coordinates with offset
 %
 %% Parse inputs
 
@@ -24,25 +24,25 @@ do_plottemp=p.Results.plottemp;
 
 % Homogeneous offset
 if length(offset)==1
-    offset=offset*ones(size(Nodes,1),1);
+    offset=offset*ones(size(nodes,1),1);
 end
 
 if do_plot
     figure(); hold on; grid on; axis image;
-    % plot(Nodes(:,1),Nodes(:,2),'ob');
+    % plot(nodes(:,1),nodes(:,2),'ob');
 end
 
-Nodes_offset=zeros(size(Nodes));
-n1_cell=cell(size(Nodes,1),1);
-n2_cell=cell(size(Nodes,1),1);
-N_cell=cell(size(Nodes,1),1);
-N_offset_cell=cell(size(Nodes,1),1);
+nodes_offset=zeros(size(nodes));
+n1_cell=cell(size(nodes,1),1);
+n2_cell=cell(size(nodes,1),1);
+N_cell=cell(size(nodes,1),1);
+N_offset_cell=cell(size(nodes,1),1);
 
-for k=1:length(Nodes)
+for k=1:length(nodes)
     
-    N1=Nodes(k,:);
-    if k==length(Nodes); ind=1; else; ind=k+1; end
-    N2=Nodes(ind,:);
+    N1=nodes(k,:);
+    if k==length(nodes); ind=1; else; ind=k+1; end
+    N2=nodes(ind,:);
     
     % n1 is vector along element
     n1=N2-N1;
@@ -77,7 +77,7 @@ for k=1:length(Nodes)
 end
 
 % Find intersection between new offset elements
-for k=1:length(Nodes)
+for k=1:length(nodes)
     
     % Parametrized vectors:
     % v1_a=N1_a+t_a*n1_a
@@ -86,23 +86,23 @@ for k=1:length(Nodes)
     
     N1_a=N_offset_cell{k}{1};
     n1_a=n1_cell{k};
-    if k==length(Nodes); ind=1; else; ind=k+1; end
+    if k==length(nodes); ind=1; else; ind=k+1; end
     N1_b=N_offset_cell{ind}{1};
     n1_b=n1_cell{ind};
     
     [t_a,t_b,Intersect_a,Intersect_b]=LineIntersect(N1_a,N1_b,n1_a,n1_b);
     
-    Nodes_offset(k,:)=Intersect_a;
+    nodes_offset(k,:)=Intersect_a;
     
 end
 
-Nodes_offset=[Nodes_offset(end,:); Nodes_offset(1:end-1,:)];
+nodes_offset=[nodes_offset(end,:); nodes_offset(1:end-1,:)];
 
-for k=1:length(Nodes)
+for k=1:length(nodes)
     
-    N1=Nodes_offset(k,:);
-    if k==length(Nodes); ind=1; else; ind=k+1; end
-    N2=Nodes_offset(ind,:);
+    N1=nodes_offset(k,:);
+    if k==length(nodes); ind=1; else; ind=k+1; end
+    N2=nodes_offset(ind,:);
     
     if do_plot
         h3(k)=plot([N1(1) N2(1)],[N1(2) N2(2)],'-xk','DisplayName','Offset');

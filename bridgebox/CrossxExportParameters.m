@@ -1,4 +1,4 @@
-function [M,ParNamesRed,M_out]=CrossxExportParameters(name_file)
+function [par_val,parameter_names,par_struct]=crossxexportparameters(name_file)
 
 %%
 
@@ -21,7 +21,7 @@ data=textscan(fid_input, '%s', 'delimiter', '\n', 'whitespace', '');
 data=data{1}; %read inputfile
 fclose(fid_input);
 
-ParNames={...
+parameter_names_long={...
     'Area (true)'
     'y'' of E-weighted c.o.g.'
     'z'' of E-weighted c.o.g.'
@@ -35,8 +35,8 @@ ParNames={...
     'I_r (polar)'
 };
 
-ParNamesRed={...
-    'Area'
+parameter_names={...
+    'A'
     'y_prime_cog'
     'z_prime_cog'
     'y_prime_cs'
@@ -51,39 +51,41 @@ ParNamesRed={...
 
 % Scale from mm to m
 
-ScaleFactor(1)=(1e3)^2; % Area
-ScaleFactor(2)=(1e3)^1; % Distance
-ScaleFactor(3)=(1e3)^1; % Distance
-ScaleFactor(4)=(1e3)^1; % Distance
-ScaleFactor(5)=(1e3)^1; % Distance
-ScaleFactor(6)=(1e3)^4; % Second moment of area
-ScaleFactor(7)=(1e3)^4; % Second moment of area
-ScaleFactor(8)=(1e3)^4; % Second moment of area
-ScaleFactor(9)=(1e3)^4; % Torsional constant
-ScaleFactor(10)=(1e3)^6; % Cw constant
-ScaleFactor(11)=(1e3)^4; % Ir constant
+scalefactor(1)=(1e3)^2; % Area
+scalefactor(2)=(1e3)^1; % Distance
+scalefactor(3)=(1e3)^1; % Distance
+scalefactor(4)=(1e3)^1; % Distance
+scalefactor(5)=(1e3)^1; % Distance
+scalefactor(6)=(1e3)^4; % Second moment of area
+scalefactor(7)=(1e3)^4; % Second moment of areapar_mm
+scalefactor(8)=(1e3)^4; % Second moment of area
+scalefactor(9)=(1e3)^4; % Torsional constant
+scalefactor(10)=(1e3)^6; % Cw constant
+scalefactor(11)=(1e3)^4; % Ir constant
 
-M=[];
-for k=1:length(ParNames)
-    
-    LineIndex=inpFindString(data,ParNames{k},'printerror','no');
-    
-    if isnan(LineIndex); M(k,1)=NaN; continue; end
-    
-    charIndex=strfind(data{LineIndex},':');
-    M(k,1)=inpReadNumber(data,LineIndex,'%f','skip',charIndex);
+par_val=[];
+for k=1:length(parameter_names_long)
 
-    M(k,1)=M(k,1)/ScaleFactor(k);
+    line_idx=strmatch(lower(parameter_names_long{k}),lower(data));
+    
+    if isnan(line_idx); par_val(k,1)=NaN; continue; end
+    
+    char_idx=strfind(data{line_idx},':');
+    % par_val(k,1)=inpReadNumber(data,line_idx,'%f','skip',char_idx);
+
+    skip=char_idx;
+    line=data{line_idx};
+
+    par_val(k,1)=sscanf(line(skip+1:end),'%f')';
+
+    par_val(k,1)=par_val(k,1)/scalefactor(k);
     
 end
 
-% % M_out = struct('names',parNamesRed);
-% [M_out(:).data] = deal(M);
+par_struct=struct();
 
-M_out=struct();
-
-for k=1:length(ParNames)
-	M_out=setfield(M_out,ParNamesRed{k},M(k));
+for k=1:length(parameter_names_long)
+	par_struct=setfield(par_struct,parameter_names{k},par_val(k));
 end
 
 

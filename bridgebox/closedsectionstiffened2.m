@@ -1,4 +1,4 @@
-function [nodes,elements,thickness]=closedsectionstiffened(nodes_box,t_box,stiff_type,stiff_cc,stiff_geo,stiff_t,varargin)
+function [nodes,elements,thickness]=closedsectionstiffened2(nodes_box,t_box,stiff_geo,stiff_t,varargin)
 %% Design (closed) bridge section with stiffeners
 %
 % Inputs:
@@ -21,21 +21,41 @@ function [nodes,elements,thickness]=closedsectionstiffened(nodes_box,t_box,stiff
 %% Parse inputs
 
 p=inputParser;
-addParameter(p,'Plot',true)
-addParameter(p,'PlotStiffener',false)
-addParameter(p,'PlotText',true)
-addParameter(p,'distedgemin',0.1*ones(size(stiff_cc)))
-addParameter(p,'distedgestart',[])
-addParameter(p,'N_stiff',[])
+addParameter(p,'Plot',true,@islogical)
+addParameter(p,'PlotStiffener',false,@islogical)
+addParameter(p,'PlotText',true,@islogical)
+% addParameter(p,'distedgemin',0.1*ones(size(stiff_cc)))
+% addParameter(p,'distedgestart',[])
+% addParameter(p,'modestiff','auto',@islogical)
+% addParameter(p,'diststiff',{})
+% addParameter(p,'typestiff',{})
+% addParameter(p,'N_stiff',[])
+addParameter(p,'edge_dist',[],@isnumeric)
+addParameter(p,'stiff_dist_cc',{},@iscell)
+addParameter(p,'stiff_type',[],@iscell)
 addParameter(p,'tol',10e-3)
+
+
+% edge_dist(k)=...;
+% stiff_dist_cc{k}(j)=...;
+% stiff_dist_base{k}(j)=...;
+% stiff_type{k}(j)=...
+
+
 
 parse(p,varargin{:});
 DoPlot=p.Results.Plot;
 DoPlotStiffener=p.Results.PlotStiffener;
 PlotText=p.Results.PlotText;
-distedgemin=p.Results.distedgemin;
-distedgestart=p.Results.distedgestart;
-N_stiff=p.Results.N_stiff;
+% stiff=p.Results.stiff;
+% distedgemin=p.Results.distedgemin;
+% distedgestart=p.Results.distedgestart;
+% N_stiff=p.Results.N_stiff;
+
+edge_dist=p.Results.edge_dist;
+stiff_dist_cc=p.Results.stiff_dist_cc;
+stiff_type=p.Results.stiff_type;
+
 tol=p.Results.tol;
 
 %% Check inputs
@@ -56,23 +76,23 @@ if length(stiff_type)~=N_el
     error('stiff_type must have N_el elements');
 end
 
-if length(stiff_cc)~=N_el
-    error('stiff_cc must have N_el elements');
-end
+% if length(stiff_cc)~=N_el
+%     error('stiff_cc must have N_el elements');
+% end
 
-if length(distedgemin)~=N_el
-    error('distedgemin must have N_el elements');
-end
+% if length(distedgemin)~=N_el
+%     error('distedgemin must have N_el elements');
+% end
+% 
+% if length(stiff_geo)~=length(stiff_t)
+%     error('stiff_geo must be same size as stiff_t');
+% end
 
-if length(stiff_geo)~=length(stiff_t)
-    error('stiff_geo must be same size as stiff_t');
-end
-
-if ~isempty(distedgestart)
-    if isempty(N_stiff)
-        error('Number of stiffeners (N_stiff) must be non-empty if distedgestart is given');
-    end
-end
+% if ~isempty(distedgestart)
+%     if isempty(N_stiff)
+%         error('Number of stiffeners (N_stiff) must be non-empty if distedgestart is given');
+%     end
+% end
 
 % If the signed area is negative, the nodes are not in CCW order
 [A_signed]=PolygonMoments(nodes_box);
@@ -113,10 +133,10 @@ end
 for k=1:length(stiff_geo)
 
     % If no stiffener, continue
-    if isnan(stiff_type(k))
-        stiff_base(k)=NaN;
-        continue
-    end
+    % if isempty(stiff_type(k))
+    %     stiff_base(k)=NaN;
+    %     continue
+    % end
     
     % If z-coordinate of last point is not zero, the stiffener is open (e.g. knife)
     if stiff_geo{k}(end,2)~=0
@@ -126,6 +146,57 @@ for k=1:length(stiff_geo)
     end
 end
 
+% if strcmpi(modestiff,'manual')
+
+% for k=1:size(nodes_box)
+
+        % Determine number of stiffeners, if distedgestart not provided then design new, else add N_stiff
+    % if isempty(distedgestart)
+    %     % Add stiffeners until DistanceEnd is smaller than distedgemin
+    %     for n_stiff=0:100
+    % 
+    % 
+    % 
+    % 
+    % 
+    %         dist_edge=(L_el(k)-(n_stiff-1)*stiff_cc(k)-dist_base/2*2)/2;
+    %         if dist_edge<distedgemin(k)
+    %             n_stiff=n_stiff-1;
+    %             dist_edge=(L_el(k)-(n_stiff-1)*stiff_cc(k))/2;
+    % 
+    %             if n_stiff==0
+    %                 warning(['No stiffener added to segment ' num2str(k) ', space too small']);
+    %             end
+    % 
+    %             break
+    %         end
+    %     end
+    % 
+    % else
+        % dist_edge=distedgestart(k);
+        % n_stiff=N_stiff(k);
+
+
+    % end
+
+% end
+
+% 
+% edge_dist(k)=...;
+% stiff_dist_cc{k}(j)=...;
+% stiff_dist_base{k}(j)=...;
+% stiff_type{k}(j)=...
+
+for k=1:size(nodes_box)
+
+    for j=1:length(stiff_type{k})
+        idx_type=stiff_type{k}(j);
+        stiff_dist_base{k}(j)=stiff_base(idx_type);
+    end
+
+end
+
+%%
 % Save nodes of box corners
 nodes_corner=[ [1:length(nodes_box)].' nodes_box];
 
@@ -152,36 +223,11 @@ for k=1:size(nodes_box,1)
     end
     
     % If no stiffener, then just add element from corner to corner
-    if isnan(stiff_type(k))
+    if isempty(stiff_type{k})
         el_number_outer=el_number_outer+1;
         el_outer{k}(end+1,:)=[el_number_outer k k_next];
         t_outer{k}(end+1,:)=[el_number_outer t_box(k)];
         continue
-    end
-    
-    % Base distance of stiffener used for this element
-    dist_base=stiff_base(stiff_type(k));
-    
-    % Determine number of stiffeners, if distedgestart not provided then design new, else add N_stiff
-    if isempty(distedgestart)
-        % Add stiffeners until DistanceEnd is smaller than distedgemin
-        for n_stiff=0:100
-            dist_edge=(L_el(k)-(n_stiff-1)*stiff_cc(k)-dist_base/2*2)/2;
-            if dist_edge<distedgemin(k)
-                n_stiff=n_stiff-1;
-                dist_edge=(L_el(k)-(n_stiff-1)*stiff_cc(k))/2;
-                
-                if n_stiff==0
-                    warning(['No stiffener added to segment ' num2str(k) ', space too small']);
-                end
-                
-                break
-            end
-        end
-        
-    else
-        dist_edge=distedgestart(k);
-        n_stiff=N_stiff(k);
     end
     
     % Vector along box element
@@ -192,20 +238,30 @@ for k=1:size(nodes_box,1)
     T=[cos(angle_rad) -sin(angle_rad) ; sin(angle_rad) cos(angle_rad)];
     
     % Add stiffeners
+    n_stiff=length(stiff_type{k});
     for j=1:n_stiff
         
         if j==1; node_number_outer_prev=k;
         else; node_number_outer_prev=node_number_outer;
         end
-        
+
+        % Base distance of stiffener used for this element
+        % dist_base=stiff_base(stiff_type(k));
+
         % Starting node stiffener
         node_number_outer=node_number_outer+1;
-        t_a=(dist_edge+(j-1)*stiff_cc(k)-dist_base/2)/L_el(k);
+        t_a=(edge_dist(k)...
+             +stiff_dist_base{k}(1)/2*0 ...
+             +sum(stiff_dist_cc{k}(1:j-1)) ...
+             -stiff_dist_base{k}(j)/2) ...
+             /L_el(k);
+        % t_a=(dist_edge+(j-1)*stiff_cc(k)-dist_base/2)/;
         nodes_outer{k}(end+1,:)=[node_number_outer N1{k}+n1*t_a];
         
         % End node stiffener
         node_number_outer=node_number_outer+1;
-        t_b=(dist_edge+(j-1)*stiff_cc(k)+dist_base/2)/L_el(k);
+        % t_b=(dist_edge+(j-1)*stiff_cc(k)+dist_base/2)/L_el(k);
+        t_b=t_a+(stiff_dist_base{k}(j))/L_el(k);
         nodes_outer{k}(end+1,:)=[node_number_outer N1{k}+n1*t_b];
         
         if t_a>1
@@ -231,17 +287,17 @@ for k=1:size(nodes_box,1)
         t_outer{k}(end+1,:)=[el_number_outer t_box(k)];
         
         % nodes and elements or stiffener body
-        N_stiff_nodes=size(stiff_geo{stiff_type(k)},1);
+        N_stiff_nodes=size(stiff_geo{stiff_type{k}(j)},1);
         for h=1:(N_stiff_nodes)
             
             node_number_stiff=node_number_stiff+1;
-            nodes_stiff_tmp{k}(end+1,:)=[node_number_stiff (T*stiff_geo{stiff_type(k)}(h,:).').'+N1{k}+n1*t_a];
+            nodes_stiff_tmp{k}(end+1,:)=[node_number_stiff (T*stiff_geo{stiff_type{k}(j)}(h,:).').'+N1{k}+n1*t_a];
             
             % For second node and on, add element
             if h>1
                 el_number_stiff=el_number_stiff+1;
                 el_stiff{k}(end+1,:)=[el_number_stiff node_number_stiff-1 node_number_stiff];
-                thickness_stiff{k}(end+1,:)=[el_number_stiff stiff_t(stiff_type(k))];
+                thickness_stiff{k}(end+1,:)=[el_number_stiff stiff_t(stiff_type{k}(j))];
             end
             
         end

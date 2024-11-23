@@ -1,10 +1,10 @@
-function CrossxGenerateThinWalledSection(Nodes,Elements,Thickness,name_section,name_file,plot_section,varargin)
+function crossxthinwalled(nodes,elements,thickness,name_section,name_file,plot_section,varargin)
 
 %% Generate CrossX input file for thinwalled section
 %
 % Inputs:
-% Nodes: (n_node*3) matrix with rows: node number, x coord, y coord
-% Elements: (n_el*3) matrix with rows: el number, start node number, end node number
+% nodes: (n_node*3) matrix with rows: node number, x coord, y coord
+% elements: (n_el*3) matrix with rows: el number, start node number, end node number
 % thickness_vector: vector with thickness of elements
 % name_section: name of section
 % name_file: name of txt file
@@ -39,47 +39,47 @@ else
     scale_factor=1;
 end
 
-Nodes(:,2:3)=scale_factor*Nodes(:,2:3);
-Thickness=scale_factor*Thickness;
+nodes(:,2:3)=scale_factor*nodes(:,2:3);
+thickness=scale_factor*thickness;
 
-n_el=size(Elements,1);
-n_node=size(Nodes,1);
+n_el=size(elements,1);
+n_node=size(nodes,1);
 
-if length(Thickness)==1
-    Thickness=Thickness*ones(n_el,1);
+if length(thickness)==1
+    thickness=thickness*ones(n_el,1);
 end
 
-if length(Thickness)~=n_el
-    error(['thickness_vector wrong length' '(is ' num2str(length(Thickness)) ', should be ' num2str(n_el) ')' ]);
+if length(thickness)~=n_el
+    error(['thickness_vector wrong length' '(is ' num2str(length(thickness)) ', should be ' num2str(n_el) ')' ]);
 end
 
-n_matrix=Nodes(:,1);
-xy_matrix=Nodes(:,2:3);
+n_matrix=nodes(:,1);
+xy_matrix=nodes(:,2:3);
 
 % Format matrix for CrossX, [node1_x node1_y node2_x node2_y ];
 for k=1:n_el
     
-    n1=find(Elements(k,2)==n_matrix);
-    n2=find(Elements(k,3)==n_matrix);
+    n1=find(elements(k,2)==n_matrix);
+    n2=find(elements(k,3)==n_matrix);
     
     if isempty(n1)
-        error(['First node of element ' num2str(Elements(k,1)) 'not found' ]);
+        error(['First node of element ' num2str(elements(k,1)) 'not found' ]);
     elseif isempty(n2)
-        error(['Second node of element ' num2str(Elements(k,1)) 'not found' ]);
+        error(['Second node of element ' num2str(elements(k,1)) 'not found' ]);
     end
     
-    matrix_out(k,:)=[ [xy_matrix(n1,1) xy_matrix(n1,2) xy_matrix(n2,1) xy_matrix(n2,2)] Thickness(k)];
+    matrix_out(k,:)=[ [xy_matrix(n1,1) xy_matrix(n1,2) xy_matrix(n2,1) xy_matrix(n2,2)] thickness(k)];
     
 
     L_el=sqrt( (matrix_out(k,1)-matrix_out(k,3))^2 + (matrix_out(k,2)-matrix_out(k,4))^2);
 
     
-    if Thickness(k)/L_el > 0.5
+    if thickness(k)/L_el > 0.5
 
-        Thickness(k)
+        thickness(k)
         L_el
         k
-        warning(['Thickness of element more than 50% of element length']);
+        warning(['thickness of element more than 50% of element length']);
     end
 
 
@@ -123,7 +123,7 @@ end
 
 if plot_section
 
-    PlotThinWalledSection(Nodes,Elements,Thickness,[],[],[],[]);
+    plotthinwalledsection(nodes,elements,thickness,[],[],[],[]);
 
 end
 
