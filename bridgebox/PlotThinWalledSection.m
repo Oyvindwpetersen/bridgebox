@@ -1,4 +1,4 @@
-function plotthinwalledsection(nodes,elements,thickness,yc,zc,ys,zs,varargin)
+function varargout=plotthinwalledsection(nodes,elements,thickness,yc,zc,ys,zs,varargin)
 %% Plot thin-walled section (box girder)
 %
 % nodes: matrix with rows [nodenumber, coord_y, coord_z]
@@ -24,6 +24,8 @@ addParameter(p,'offset',[],@isnumeric)
 addParameter(p,'mirror',false,@islogical)
 addParameter(p,'hax',[],@ishandle)
 addParameter(p,'interpreter','latex',@ischar)
+addParameter(p,'xlabel',[],@ischar)
+addParameter(p,'ylabel',[],@ischar)
 
 parse(p,varargin{:});
 markersize=p.Results.markersize;
@@ -38,6 +40,8 @@ offset=p.Results.offset;
 mirror=p.Results.mirror;
 hax=p.Results.hax;
 interpreter=p.Results.interpreter;
+xl=p.Results.xlabel;
+yl=p.Results.ylabel;
 
 %%
 
@@ -116,8 +120,10 @@ end
 % Plot nodes as markers
 if markersize==0 | isnan(markersize)
 else
-plot(nodes(:,2),nodes(:,3),'o','markersize',markersize,'Color',nodecolor);
+h_nodes=plot(nodes(:,2),nodes(:,3),'o','markersize',markersize,'Color',nodecolor);
+hideanno(h_nodes);
 end
+
 
 % Plot node labels
 if plottext
@@ -125,6 +131,10 @@ if plottext
         text(nodes(k,2),nodes(k,3),['N' num2str(nodes(k,1))],'fontsize',fontsize);
     end
 end
+
+
+plot_matrix_x={};
+plot_matrix_y={};
 
 % Plot elements
 for k=1:size(elements,1)
@@ -136,8 +146,14 @@ for k=1:size(elements,1)
     N1=nodes(idx1,2:3);
     N2=nodes(idx2,2:3);
     
-    plot([N1(1) N2(1)],[N1(2) N2(2)],'-','Color',elcolor,'linewidth',linewidth);
-    
+    hp_el(k)=plot([N1(1) N2(1)],[N1(2) N2(2)],'-','Color',elcolor,'linewidth',linewidth);
+
+    plot_matrix_x{end+1}=[N1(1) N2(1)];
+    plot_matrix_x{end+1}=[NaN];
+
+    plot_matrix_y{end+1}=[N1(2) N2(2)];
+    plot_matrix_y{end+1}=[NaN];
+
     % Plot element labels
     if plottext
         
@@ -151,6 +167,10 @@ for k=1:size(elements,1)
     end
     
 end
+
+delete(hp_el)
+
+hp_el=plot(cell2mat(plot_matrix_x),cell2mat(plot_matrix_y),'-','Color',elcolor,'linewidth',linewidth);
 
 % Plot center of area
 if ~isempty(yc) & ~isempty(zc)
@@ -170,5 +190,13 @@ xlim([min(nodes(:,2))-1 max(nodes(:,2))+1]);
 ylim([min(nodes(:,3))-0.5 max(nodes(:,3))+0.5]);
 axistight(gca,[0.1 0.1],'x','y');
 
-xlabel('$y$ [m]','Interpreter',interpreter);
-ylabel('$z$ [m]','Interpreter',interpreter);
+if isempty(xl); xl='$y$ [m]'; end
+if isempty(yl); yl='$z$ [m]'; end
+
+
+xlabel(xl,'Interpreter',interpreter);
+ylabel(yl,'Interpreter',interpreter);
+
+% if nargout>1
+varargout{1}=hp_el;
+% end
